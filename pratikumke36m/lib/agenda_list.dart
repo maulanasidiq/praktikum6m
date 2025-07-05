@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'agenda.dart';
 import 'agenda_form.dart';
 import 'agenda_service.dart';
@@ -44,9 +45,17 @@ class _AgendaListState extends State<AgendaList> {
               itemCount: data.length,
               itemBuilder: (_, i) {
                 final item = data[i];
+
+                // Format tanggal dengan intl
+                final tanggalFormatted =
+                    DateFormat('EEEE, d MMMM y', 'id_ID').format(item.tanggal);
+
                 return ListTile(
                   title: Text(item.judul),
-                  subtitle: Text(item.keterangan),
+                  subtitle: Text(
+                    '${item.keterangan}\nTanggal: $tanggalFormatted',
+                  ),
+                  isThreeLine: true,
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

@@ -16,21 +16,32 @@ class _AgendaFormState extends State<AgendaForm> {
   final _ket = TextEditingController();
   final _service = AgendaService();
 
+  DateTime? _tanggal;
+
   @override
   void initState() {
     super.initState();
     if (widget.agenda != null) {
       _judul.text = widget.agenda!.judul;
       _ket.text = widget.agenda!.keterangan;
+      _tanggal = widget.agenda!.tanggal;
     }
   }
 
   void _submit() async {
     if (_formKey.currentState!.validate()) {
+      if (_tanggal == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Tanggal harus dipilih')),
+        );
+        return;
+      }
+
       final agenda = Agenda(
         id: widget.agenda?.id,
         judul: _judul.text,
         keterangan: _ket.text,
+        tanggal: _tanggal!,
       );
       try {
         if (widget.agenda == null) {
@@ -47,8 +58,26 @@ class _AgendaFormState extends State<AgendaForm> {
     }
   }
 
+  Future<void> _pickDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _tanggal ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() {
+        _tanggal = picked;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final String labelTanggal = _tanggal == null
+        ? 'Pilih Tanggal'
+        : '${_tanggal!.day}/${_tanggal!.month}/${_tanggal!.year}';
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.agenda == null ? 'Tambah Agenda' : 'Edit Agenda'),
@@ -68,6 +97,21 @@ class _AgendaFormState extends State<AgendaForm> {
               TextFormField(
                 controller: _ket,
                 decoration: const InputDecoration(labelText: 'Keterangan'),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      labelTanggal,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: _pickDate,
+                    child: const Text('Pilih Tanggal'),
+                  ),
+                ],
               ),
               const SizedBox(height: 20),
               ElevatedButton(

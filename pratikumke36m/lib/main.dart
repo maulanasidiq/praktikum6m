@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart'; // ← Tambahkan ini
 import 'agenda_list.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding
+      .ensureInitialized(); // ← Wajib untuk async sebelum runApp
+  await initializeDateFormatting(
+      'id_ID', null); // ← Inisialisasi format lokal Indonesia
   runApp(const MyApp());
 }
 
